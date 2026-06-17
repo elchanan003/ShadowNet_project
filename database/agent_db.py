@@ -157,13 +157,3 @@ class DB_agent():
                 if count:
                     return count[0]
                 return False
-        
-
-
-
-                
-
-
-
-
-
