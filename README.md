@@ -126,7 +126,7 @@ __עשרה חוקים לרשימת הנתונים__
 
 __הוראות הרצה__
 
-docker run -p 3306:3306 --name my-mysql -e MYSQL_ROOT_PASSWORD=root -e MYSQL_DATABASE=Intelligence_db -d mysql:latest
+docker run -p 3306:3306 --name my-mysql -e MYSQL_ROOT_PASSWORD=1234 -e MYSQL_DATABASE=Intelligence_db -d mysql:8.0
 
 *הטבלאות נוצרות בהפעלת הקובץ main
 
