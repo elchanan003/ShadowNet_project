@@ -1,5 +1,5 @@
 from database.db_connection import DB_connection, db
-from schems import Mission
+from database.schems import Mission
 
 
 class MissionDB():
@@ -22,7 +22,7 @@ class MissionDB():
         with self.db.get_connection() as conn:
             with conn.cursor(dictionary=True) as cur:
                 sql = """
-                INSERT INTO mission(title, description, location, difficulty, importance, status, risk_level) 
+                INSERT INTO missions(title, description, location, difficulty, importance, status, risk_level) 
                 VALUES(%s, %s, %s, %s, %s, %s, %s)    
                 """
                 val = (data.title, data.description, data.location, data.difficulty, data.importance, data.status, level)
@@ -34,7 +34,7 @@ class MissionDB():
                 SELECT * FROM missions
                 WHERE id = %s
                 """
-                new_id = cur.lastrowid()
+                new_id = cur.lastrowid
 
                 cur.execute(sql, (new_id,))
 
@@ -81,7 +81,7 @@ class MissionDB():
                 cur.execute(sql, val)
                 conn.commit()
 
-                if cur.rowcount() > 0:
+                if cur.rowcount > 0:
                     return 'Updated successfully'
                 return 'Update failed'
 
@@ -98,7 +98,7 @@ class MissionDB():
                 cur.execute(sql, val)
                 conn.commit()
 
-                if cur.rowcount() > 0:
+                if cur.rowcount > 0:
                     return 'Updated successfully'
                 return 'Update failed'
             
@@ -189,5 +189,6 @@ class MissionDB():
                 return agent if agent else False
         
 
+db_mission = MissionDB(db)
             
     

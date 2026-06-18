@@ -1,5 +1,5 @@
 from database.db_connection import DB_connection, db
-from schems import Agent
+from database.schems import Agent
 
 
 class AgentDB():
@@ -8,11 +8,12 @@ class AgentDB():
 
 
     def create_agent(self, data:Agent):
+        print(data.model_dump())
         with self.db.get_connection() as conn:
             with conn.cursor(dictionary=True) as cur:
                 sql = """
                 INSERT INTO agents(name, specialty, is_active, completed_missions, failed_missions, agent_rank)
-                VALUES(%s, %s, %s, %s, %s, %s)    
+                VALUES (%s, %s, %s, %s, %s, %s)    
                 """
                 val = (data.name, data.specialty, data.is_active, data.completed_missions, data.failed_missions, data.agent_rank)
 
@@ -23,12 +24,12 @@ class AgentDB():
                 SELECT * FROM agents
                 WHERE id = %s
                 """
-                new_id = cur.lastrowid()
+                new_id = cur.lastrowid
 
                 cur.execute(sql, (new_id,))
 
                 agent = cur.fetchone()
-                return agent if agent else False
+                return agent if agent else 'Operation failed'
             
     def get_all_agents(self):
         with self.db.get_connection() as conn:
@@ -58,7 +59,7 @@ class AgentDB():
             with conn.cursor() as cur:
                 sql = """
                 UPDATE agents
-                SET name = %s, specialty =%s, is_active=%s, completed_missions=%s, failed_missions=%s, agent_rank=%s)   
+                SET name = %s, specialty =%s, is_active=%s, completed_missions=%s, failed_missions=%s, agent_rank=%s   
                 WHERE id = %s 
                 """
                 val = (data.name, data.specialty, data.is_active, data.completed_missions, data.failed_missions, data.agent_rank, id)
@@ -66,7 +67,7 @@ class AgentDB():
                 cur.execute(sql, val)
                 conn.commit()
 
-                if cur.rowcount() > 0:
+                if cur.rowcount > 0:
                     return 'Updated successfully'
                 return 'Update failed'
               
@@ -82,7 +83,7 @@ class AgentDB():
                 cur.execute(sql, (id,))
                 conn.commit()
 
-                if cur.rowcount() > 0:
+                if cur.rowcount > 0:
                     return 'Updated successfully'
                 return 'Update failed'
     
