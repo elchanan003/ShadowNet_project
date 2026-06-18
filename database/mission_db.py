@@ -82,8 +82,8 @@ class MissionDB():
                 conn.commit()
 
                 if cur.rowcount > 0:
-                    return 'Updated successfully'
-                return 'Update failed'
+                    return 'PROGRESS_IN'
+                return None
 
     def update_mission_status(self, id:int, status:str):
         with self.db.get_connection() as conn:
@@ -97,6 +97,9 @@ class MissionDB():
 
                 cur.execute(sql, val)
                 conn.commit()
+
+                if self.get_mission_by_id(id) is None:
+                    return None 
 
                 if cur.rowcount > 0:
                     return 'Updated successfully'
@@ -176,7 +179,7 @@ class MissionDB():
 
     def get_top_agent(self):
         with self.db.get_connection() as conn:
-            with conn.cursor() as cur:
+            with conn.cursor(dictionary=True) as cur:
                 sql = """
                 SELECT * FROM agents
                 ORDER BY completed_missions DESC
@@ -186,7 +189,7 @@ class MissionDB():
                 cur.execute(sql)
                 
                 agent = cur.fetchone()
-                return agent if agent else False
+                return agent if agent else None
         
 
 db_mission = MissionDB(db)

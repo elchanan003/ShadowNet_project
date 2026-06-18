@@ -1,5 +1,4 @@
 from pydantic import BaseModel, Field
-from typing import Literal
 
 
 class Agent(BaseModel):
@@ -8,14 +7,14 @@ class Agent(BaseModel):
     is_active          : bool
     completed_missions : int 
     failed_missions    : int  
-    agent_rank         : str = Literal['Junior', 'Senior', 'Commander']
+    agent_rank         : str 
 
 class Mission(BaseModel):
     title             : str = Field(max_length=255)
     description       : str
     location          : str = Field(max_length=255)
-    difficulty        : int = Field(ge=0, le=10)
-    importance        : int = Field(ge=0, le=10)
+    difficulty        : int 
+    importance        : int 
     status            : str = Field(max_length=50)
     assigned_agent_id : int | None
 

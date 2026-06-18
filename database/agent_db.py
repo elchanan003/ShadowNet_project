@@ -69,7 +69,7 @@ class AgentDB():
 
                 if cur.rowcount > 0:
                     return 'Updated successfully'
-                return 'Update failed'
+                return None
               
     def deactivate_agent(self, id:int):
          with self.db.get_connection() as conn:
@@ -83,9 +83,10 @@ class AgentDB():
                 cur.execute(sql, (id,))
                 conn.commit()
 
-                if cur.rowcount > 0:
-                    return 'Updated successfully'
-                return 'Update failed'
+                if self.get_agent_by_id(id) is None:
+                    return None
+                else:
+                    return True
     
     def increment_completed(self, id:int):
         with self.db.get_connection() as conn:
@@ -99,7 +100,7 @@ class AgentDB():
                 cur.execute(sql, (id,))
                 conn.commit()
 
-                if cur.rowcount() > 0:
+                if cur.rowcount > 0:
                     return 'Updated successfully'
                 return 'Update failed'
             
@@ -115,7 +116,7 @@ class AgentDB():
                 cur.execute(sql, (id,))
                 conn.commit()
 
-                if cur.rowcount() > 0:
+                if cur.rowcount > 0:
                     return 'Updated successfully'
                 return 'Update failed'
             
@@ -142,7 +143,7 @@ class AgentDB():
                         }
                     
                     return perform_dic
-                return False
+                return None
             
     def count_active_agents(self):
         with self.db.get_connection() as conn:
