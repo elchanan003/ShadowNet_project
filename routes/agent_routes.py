@@ -9,9 +9,12 @@ agent_router = APIRouter(prefix='/agents', tags=['Agents'])
 
 @agent_router.post(path='/', status_code=201)
 def add_agent_route(data:Agent):
+    if data.agent_rank not in ('Junior', 'Senior', 'Commander'):
+        raise HTTPException(status_code=400, detail='Invalit rank')
+    
     try:
         agent = db_agent.create_agent(data)
-        return agent 
+        return {'message': agent}
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail='Something went wrong')
     
@@ -20,16 +23,19 @@ def add_agent_route(data:Agent):
 def all_agents_routes():
     try:
         agents = db_agent.get_all_agents()
-        return agents 
+        return {'message':agents} 
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail='Something went wrong')
-   
-    
+
+
 @agent_router.get('/{id}')
 def agent_by_id_route(id:int):
     try:
         agent = db_agent.get_agent_by_id(id)
-        return agent
+        if agent is None:
+            raise HTTPException(status_code=404, detail='Not Found')
+        return {'message': agent}
+    
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail='Something went wrong')
     
@@ -37,7 +43,11 @@ def agent_by_id_route(id:int):
 @agent_router.put('/{id}')
 def update_agent_routes(id:int, data:Agent):
     try:
-        return db_agent.update_agent(id, data)
+        status = db_agent.update_agent(id, data)
+        if status is None:
+            raise HTTPException(status_code=404, detail='Not Found')
+        else:
+            return {'message': status}
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail='Something went wrong')
     
@@ -45,7 +55,11 @@ def update_agent_routes(id:int, data:Agent):
 @agent_router.put('/{id}/deactivate')
 def agent_deactivate(id:int):
     try:
-        return db_agent.deactivate_agent(id)
+        status = db_agent.deactivate_agent(id)
+        if status is None:
+            raise HTTPException(status_code=404, detail='Not Found')
+        else:
+            return {'message': 'is_active = False'}
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail='Something went wrong')
     
@@ -53,7 +67,11 @@ def agent_deactivate(id:int):
 @agent_router.get('/{id}/performance')
 def agent_performance(id:int):
     try:
-        return db_agent.get_agent_performance(id)
+        status = db_agent.get_agent_performance(id)
+        if status is None:
+            raise HTTPException(status_code=404, detail='Not Found')
+        else:
+            return {'message': status}
     except mysql.connector.Error as e:
         raise HTTPException(status_code=500, detail='Something went wrong')
     
