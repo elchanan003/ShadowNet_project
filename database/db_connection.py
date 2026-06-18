@@ -42,7 +42,7 @@ class DB_connection:
                 name VARCHAR(50) NOT NULL,
                 specialty VARCHAR(50) NOT NULL,
                 is_active BOOL DEFAULT TRUE,
-                completed_mission INT DEFAULT 0,
+                completed_missions INT DEFAULT 0,
                 failed_missions INT DEFAULT 0,
                 agent_rank ENUM('Junior', 'Senior', 'Commander')
                 )
