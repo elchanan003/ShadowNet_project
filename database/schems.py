@@ -5,8 +5,8 @@ class Agent(BaseModel):
     name               : str = Field(max_length=50)
     specialty          : str = Field(max_length=50)
     is_active          : bool
-    completed_missions : int = Field(le=1, ge=10)
-    failed_missions    : int = Field(le=1, ge=10)
+    completed_missions : int 
+    failed_missions    : int  
     agent_rank         : str = Field(max_length=50)
 
 class Mission(BaseModel):

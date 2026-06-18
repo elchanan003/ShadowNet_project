@@ -2,7 +2,7 @@ from database.db_connection import DB_connection, db
 from schems import Mission
 
 
-class DB_mission():
+class MissionDB():
     def __init__(self, db:DB_connection):
         self.db = db
 
@@ -19,11 +19,11 @@ class DB_mission():
         elif 24 < level_num:    
             level = 'CRITICAL'
 
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor(dictionary=True) as cur:
                 sql = """
-                INSERT INTO agents(title, description, location, difficulty, importance, status, risk_level, assigned_agent_id) 
-                VALUES(%s, %s, %s, %s, %s, %s, %s, None)    
+                INSERT INTO mission(title, description, location, difficulty, importance, status, risk_level) 
+                VALUES(%s, %s, %s, %s, %s, %s, %s)    
                 """
                 val = (data.title, data.description, data.location, data.difficulty, data.importance, data.status, level)
 
@@ -42,17 +42,17 @@ class DB_mission():
                 return mission if mission else False
              
     def get_all_missions(self):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor(dictionary=True) as cur:
                 sql = "SELECT * FROM missions"
 
                 cur.execute(sql)
                 
                 missions = cur.fetchall()
-                return missions if missions else False
+                return missions if missions else []
 
     def get_mission_by_id(self, id:int):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor(dictionary=True) as cur:
                 sql = """
                 SELECT * FROM missions
@@ -69,10 +69,10 @@ class DB_mission():
         #אם risk_level=CRITICAL — רק סוכן בדרגת Commander יכול לקבל את המשימה.
         #סוכן לא יכול להחזיק יותר מ-3 משימות פתוחות (ASSIGNED / IN_PROGRESS) במקביל.
         #ניתן לשייך רק משימה בסטטוס NEW. לאחר שיוך: status=ASSIGNED.
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = """
-                UPDATE mission
+                UPDATE missions
                 SET assigned_agent_id = %s
                 WHERE id = %s
                 """
@@ -86,10 +86,10 @@ class DB_mission():
                 return 'Update failed'
 
     def update_mission_status(self, id:int, status:str):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = """
-                UPDATE mission
+                UPDATE missions
                 SET status = %s
                 WHERE id = %s
                 """
@@ -103,28 +103,22 @@ class DB_mission():
                 return 'Update failed'
             
     def get_open_missions_by_agent(self, id:int):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor(dictionary=True) as cur:
                 sql = """
                 SELECT * FROM missions
-                WHERE assigned_agent_id = %s  
+                WHERE assigned_agent_id = %s AND status IN ('IN_PROGRESS', 'ASSIGNED')
                 """
 
                 cur.execute(sql, (id,))
                 
                 missions = cur.fetchall()
-                
-                if missions:
-                    missions_ls = []
-                    for mission in missions:
-                        if mission['status'] == 'IN_PROGRESS' or mission['status'] == 'ASSIGNED':
-                            missions_ls.append(mission)
-                    
-                    return missions_ls
+                if missions:                
+                    return missions
                 return []
 
     def count_all_missions(self):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = "SELECT COUNT(*) FROM missions"
 
@@ -136,7 +130,7 @@ class DB_mission():
                 return False
 
     def count_by_status(self, status:str):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = """
                 SELECT COUNT(*) FROM missions
@@ -151,11 +145,11 @@ class DB_mission():
                 return False
             
     def count_open_missions(self):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = """
                 SELECT COUNT(*) FROM missions
-                WHERE status = 'IN_PROGRESS' OR 'ASSIGNED'
+                WHERE status IN ('IN_PROGRESS', 'ASSIGNED')
                 """
 
                 cur.execute(sql)
@@ -166,7 +160,7 @@ class DB_mission():
                 return False
 
     def count_critical_missions(self):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = """
                 SELECT COUNT(*) FROM missions
@@ -181,7 +175,7 @@ class DB_mission():
                 return False
 
     def get_top_agent(self):
-        with self.db.get_conection() as conn:
+        with self.db.get_connection() as conn:
             with conn.cursor() as cur:
                 sql = """
                 SELECT * FROM agents

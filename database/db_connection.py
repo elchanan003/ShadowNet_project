@@ -8,7 +8,7 @@ class DB_connection:
         self.password = password
         self.database = database
 
-    def get_conection(self):
+    def get_connection(self):
         conn = mysql.connector.connect(
             host=self.host, user=self.user, password=self.password, database=self.database
         )
@@ -33,7 +33,7 @@ class DB_connection:
 
 
     def create_tables(self):
-        with self.get_conection() as conn:
+        with self.get_connection() as conn:
             with conn.cursor() as cur:
 
                 sql_agents_table = """
@@ -48,7 +48,7 @@ class DB_connection:
                 )
                 """
                 sql_missions_table = """
-                CREATE TABLE IF NOT EXISTS mission(
+                CREATE TABLE IF NOT EXISTS missions(
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 title VARCHAR(255) NOT NULL,
                 description TEXT NOT NULL,
