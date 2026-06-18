@@ -42,6 +42,16 @@ def mission_by_id_route(id:int):
 
 @mission_router.put('/missions/{id}/assign/{agent_id}')
 def assign_mission_route(id:int, agent_id:int):
+    mission = db_mission.get_mission_by_id(id)
+    agent = db_agent.get_agent_by_id(agent_id)
+
+    if mission is None or agent is None:
+        raise HTTPException(404)
+
+    if mission['status'] != 'NEW':
+        raise HTTPException(400)
+    
+    
     try:
         return db_mission.assign_mission(id, agent_id)
     except mysql.connector.Error as e:
